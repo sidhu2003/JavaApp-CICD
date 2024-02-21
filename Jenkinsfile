@@ -34,3 +34,5 @@ pipeline {
                 sh 'mvn checkstyle:checkstyle'
             }
         }
+    }
+}
