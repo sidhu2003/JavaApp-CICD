@@ -5,12 +5,6 @@ pipeline {
 	    jdk "OracleJDK21"
 	}
     stages{
-        stage('Fetch code') {
-          steps{
-              git branch: 'vp-rem', url:'https://github.com/devopshydclub/vprofile-repo.git'
-          }  
-        }
-
         stage('Build') {
             steps {
                 sh 'mvn clean install -DskipTests'
