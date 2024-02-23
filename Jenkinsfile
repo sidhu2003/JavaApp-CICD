@@ -49,14 +49,13 @@ pipeline {
                         )
             }
         }
-
-    }
-
-    post{
-        always{
+         post{
+             always{
             slacksend channel: '#jenkinscicd', 
             color: '#0000FF', 
             message: "Job'${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
         }
+
     }
+}
 }
