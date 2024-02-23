@@ -2,7 +2,7 @@ pipeline {
     agent any
     tools {
 	    maven "MAVEN"
-	    jdk "OracleJDK21"
+	    jdk "OracleJDK11"
 	}
     stages{
         stage('Build') {
@@ -29,11 +29,16 @@ pipeline {
             }
         }
 	stage('Sonar Analysis') {
+            environment {
+                scannerHome = tool 'sonar'
+            }
             steps {
-                // Run SonarQube analysis
-               withSonarQubeEnv(installationName: 'sonar') { 
-                    sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
-        }
+               withSonarQubeEnv('sonar') {
+                   sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=login-app \
+                   -Dsonar.projectName=login-app \
+                   -Dsonar.projectVersion=1.0 \
+                   -Dsonar.sources=src/'''
+              }
             }
         }
     }
