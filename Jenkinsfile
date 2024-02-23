@@ -54,15 +54,21 @@ pipeline {
 
     post{
         always{
-            slacksend(channel: '#jenkinscicd', color: '#0000FF', message: "Job is'${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slacksend channel: '#jenkinscicd', 
+            color: '#0000FF', 
+            message: "Job'${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
         }
         
         success{
-            slacksend(channel: '#jenkinscicd', color: '#00FF00', message: "Job Success'${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slacksend channel: '#jenkinscicd', 
+            color: '#00FF00', 
+            message: "Job'${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
         }
 
         failure{
-            slacksend(channel: '#jenkinscicd', color: '#FF0000', message: "Job Failed'${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})")
+            slacksend channel: '#jenkinscicd',
+             color: '#FF0000',
+             message: "Job'${env.JOB_NAME} [${env.BUILD_NUMBER}]' (${env.BUILD_URL})"
         }
     }
 }
