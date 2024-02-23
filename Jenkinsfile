@@ -28,5 +28,13 @@ pipeline {
                 sh 'mvn checkstyle:checkstyle'
             }
         }
+	stage('Sonar Analysis') {
+            steps {
+                // Run SonarQube analysis
+               withSonarQubeEnv(installationName: 'sonar') { 
+                    sh 'mvn clean org.sonarsource.scanner.maven:sonar-maven-plugin:3.9.0.2155:sonar'
+        }
+            }
+        }
     }
 }
