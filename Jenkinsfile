@@ -28,18 +28,6 @@ pipeline {
                 sh 'mvn checkstyle:checkstyle'
             }
         }
-	stage('Sonar Analysis') {
-            environment {
-                scannerHome = tool 'sonar'
-            }
-            steps {
-               withSonarQubeEnv('sonar') {
-                   sh '''${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=login-app \
-                   -Dsonar.projectName=login-app \
-                   -Dsonar.projectVersion=1.0 \
-                   -Dsonar.sources=src/'''
-              }
-            }
-        }
+
     }
 }
