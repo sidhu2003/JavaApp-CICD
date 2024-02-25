@@ -1,5 +1,11 @@
+def COLOR_MAP = [
+    'SUCCESS': 'good',
+    'FAILURE': 'danger'
+]
+
 pipeline {
     agent any
+	
     tools {
 	    maven "MAVEN"
 	    jdk "OracleJDK11"
@@ -12,6 +18,7 @@ pipeline {
         cluster = "login"
         service = "loginappsvc"
     }
+	
   stages {
     stage('Fetch code'){
       steps {
@@ -70,4 +77,12 @@ pipeline {
      }
 
   }
+	post {
+        always {
+            echo 'Slack Notification'
+            slackSend channel: '#jenkinscicd',
+            color: COLOR_MAP[currentBuild.currentResult],
+            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME}"
+        }
+    }
 }
