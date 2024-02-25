@@ -9,6 +9,8 @@ pipeline {
         registryCredential = 'ecr:us-east-1:awscreds'
         appRegistry = "817780818534.dkr.ecr.us-east-1.amazonaws.com/login-app"
         loginappRegistry = "https://817780818534.dkr.ecr.us-east-1.amazonaws.com"
+        cluster = "login"
+        service = "loginappsvc"
     }
   stages {
     stage('Fetch code'){
@@ -55,6 +57,16 @@ pipeline {
               }
             }
           }
+     }
+
+     stage('Deplot to ECS'){
+        steps {
+            withAWS(region: 'us-east-1',credentials: 'awscreds') {
+                script {
+                   sh 'aws ecs update-service --cluster ${cluster} --service ${service} --force-new-deployment'
+                }
+            }
+        }
      }
 
   }
