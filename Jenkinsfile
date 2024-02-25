@@ -59,7 +59,7 @@ pipeline {
           }
      }
 
-     stage('Deplot to ECS'){
+     stage('Deploy to ECS'){
         steps {
             withAWS(region: 'us-east-1',credentials: 'awscreds') {
                 script {
