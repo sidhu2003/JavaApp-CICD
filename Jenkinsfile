@@ -1,68 +1,61 @@
-def COLOR_MAP = [
-    'SUCCESS': 'good',
-    'FAILURE': 'danger'
-]
-
 pipeline {
     agent any
-
     tools {
 	    maven "MAVEN"
 	    jdk "OracleJDK11"
 	}
 
-    stages{
-        stage('Build') {
-            steps {
-                sh 'mvn clean install -DskipTests'
-            }
-            post {
-                success {
-                    echo "Now Archiving."
-                    archiveArtifacts artifacts: '**/*.war'
-                }
-            }
-        }
-        stage('Test'){
-            steps {
-                sh 'mvn test'
-            }
+    environment {
+        registryCredential = 'ecr:us-east-1:awscreds'
+        appRegistry = "817780818534.dkr.ecr.us-east-1.amazonaws.com/login-app"
+        loginappRegistry = "https://817780818534.dkr.ecr.us-east-1.amazonaws.com"
+    }
+  stages {
+    stage('Fetch code'){
+      steps {
+        git branch: 'docker', url: 'https://github.com/sidhu2003/login-app.git'
+      }
+    }
 
-        }
 
-        stage('Checkstyle Analysis'){
+    stage('Test'){
+      steps {
+        sh 'mvn test'
+      }
+    }
+
+    stage ('CODE ANALYSIS WITH CHECKSTYLE'){
             steps {
                 sh 'mvn checkstyle:checkstyle'
             }
-        }
-
-        stage('Upload Artifact'){
-            steps {
-                    nexusArtifactUploader(
-                        nexusVersion: 'nexus3',
-                        protocol: 'http',
-                        nexusUrl: '172.31.89.187:8081',
-                        groupId: 'com.example',
-                        version: "${env.BUILD_NUMBER}-${env.BUILD_TIMESTAMP}",
-                        repository: 'login-app',
-                        credentialsId: 'nexuslogin',
-                            artifacts: [
-                                    [artifactId: 'login-app',
-                                    file: 'target/dptweb-1.0.war',
-                                     type: 'war']
-                            ]
-                        )
+            post {
+                success {
+                    echo 'Generated Analysis Result'
+                }
             }
         }
-        
-} 
-post {
-        always {
-            echo 'Slack Notification'
-            slackSend channel: '#jenkinscicd',
-            color: COLOR_MAP[currentBuild.currentResult],
-            message: "*${currentBuild.currentResult}:* Job ${env.JOB_NAME} "
-        }
+
+    stage('Build App Image') {
+       steps {
+       
+         script {
+                dockerImage = docker.build( appRegistry + ":$BUILD_NUMBER", "./")
+             }
+
+     }
+    
     }
 
+    stage('Upload App Image') {
+          steps{
+            script {
+              docker.withRegistry( loginappRegistry, registryCredential ) {
+                dockerImage.push("$BUILD_NUMBER")
+                dockerImage.push('latest')
+              }
+            }
+          }
+     }
+
+  }
 }
