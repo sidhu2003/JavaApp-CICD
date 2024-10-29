@@ -1,7 +1,7 @@
 FROM openjdk:11 AS BUILD_IMAGE
 RUN apt update && apt install maven -y
-RUN git clone https://github.com/sidhu2003/login-app.git
-RUN cd login-app && git checkout docker && mvn install
+RUN git clone https://github.com/sidhu2003/JavaApp-CICD.git
+RUN mvn install
 
 FROM tomcat:9-jre11
 
